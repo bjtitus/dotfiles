@@ -1,4 +1,4 @@
-# holman does dotfiles
+# Brandon's Very Own dotfiles
 
 ## dotfiles
 
@@ -13,15 +13,19 @@ up into the main areas I used (Ruby, git, system libraries, and so on), so I
 structured the project accordingly.
 
 If you're interested in the philosophy behind why projects like these are
-awesome, you might want to [read my post on the
+awesome, you might want to [read Zach Holman's post on the
 subject](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/).
+
+## oh-my-zsh
+
+Part of the major changes in this branch are to make the bootstrap install approach more friendly with oh-my-zsh. I have made a separate `$DOTS` path which points to the .dotfiles directory and zshrc.symlink has some checking to see if .oh-my-zsh exists. This is NOT complete yet and the zshrc still contains some settings which might break if oh-my-zsh is not installed.
 
 ## install
 
 Run this:
 
 ```sh
-git clone https://github.com/holman/dotfiles.git ~/.dotfiles
+git clone https://github.com/bjtitus/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 script/bootstrap
 ```
@@ -33,7 +37,7 @@ The main file you'll want to change right off the bat is `zsh/zshrc.symlink`,
 which sets up a few paths that'll be different on your particular machine.
 
 You'll also want to change `git/gitconfig.symlink`, which will set you up as
-committing as Zach Holman. You probably don't want that.
+committing as Brandon Titus. You probably don't want that.
 
 ## topical
 
