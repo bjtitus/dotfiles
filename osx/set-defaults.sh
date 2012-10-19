@@ -39,3 +39,17 @@ defaults write com.apple.Safari IncludeDevelopMenu -bool true
 defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
 defaults write com.apple.Safari "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" -bool true
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+
+# Some stuff below was grabbed from here: http://osxdaily.com/2012/10/09/best-defaults-write-commands-mac-os-x/
+# Set Mission Control speed faster so it's a little more usable
+defaults write com.apple.dock expose-animation-duration -float 0.15
+# NOTE: You can go back to default using: defaults delete com.apple.dock expose-animation-duration
+
+# Remove Auto-Hide Dock Delay
+defaults write com.apple.Dock autohide-delay -float 0
+
+# Don't include name with email address copy in Mail.app
+defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
+
+# Enable text selection in QuickLook
+defaults write com.apple.finder QLEnableTextSelection -bool TRUE
