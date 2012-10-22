@@ -20,6 +20,12 @@ subject](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/).
 
 Part of the major changes in this branch are to make the bootstrap install approach more friendly with oh-my-zsh. I have made a separate `$DOTS` path which points to the .dotfiles directory and zshrc.symlink has some checking to see if .oh-my-zsh exists. This is NOT complete yet and the zshrc still contains some settings which might break if oh-my-zsh is not installed.
 
+## iTerm 2
+
+When setting up a new machine, make sure to point iTerm 2 to the synced profile in Dropbox. Currently in the following path:
+
+`App Files/iTerm2`
+
 ## install
 
 Run this:
