@@ -26,6 +26,12 @@ When setting up a new machine, make sure to point iTerm 2 to the synced profile 
 
 `App Files/iTerm2`
 
+## Fonts
+
+Note that there seems to be some trouble with installing fonts so it may be necessary to install Menlo Powerline by hand. I think this is just a timing thing but it can be found in:
+
+`~/Library/Fonts`
+
 ## install
 
 Run this:
