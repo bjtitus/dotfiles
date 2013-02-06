@@ -5,8 +5,8 @@
 [hub]
         protocol = https
 [user]
-        name = Brandon Titus
-        email = bjtitus@gmail.com
+	name = Brandon Titus
+	email = bjtitus@gmail.com
 [credential]
         helper = osxkeychain
 [alias]
@@ -19,15 +19,25 @@
         diff = auto
         status = auto
         branch = auto
-        ui = true
+	ui = always
 [core]
         excludesfile = ~/.gitignore
         editor = vim
 [apply]
         whitespace = nowarn
 [mergetool]
-        keepBackup = false
+	keepBackup = false
+	prompt = false
 [difftool]
-        prompt = false
+	prompt = false
 [help]
         autocorrect = 1
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[diff]
+	tool = Kaleidoscope
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
+[merge]
+	tool = Kaleidoscope
