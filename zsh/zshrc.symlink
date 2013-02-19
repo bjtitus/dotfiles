@@ -32,3 +32,4 @@ if [[ -a ~/.oh-my-zsh ]]
 then
 	source $ZSH/oh-my-zsh.sh
 fi
+PATH=$PATH:$HOME/.rvm/bin:$DOTS/bin # Add RVM to PATH for scripting
