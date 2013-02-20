@@ -1,0 +1,14 @@
+{
+	"installed_packages":
+	[
+		"Git",
+		"Github Tools",
+		"Package Control",
+		"SublimeLinter",
+		"Theme - Soda"
+	],
+	"repositories":
+	[
+		"https://sublime.wbond.net/testing/packages.json"
+	]
+}
