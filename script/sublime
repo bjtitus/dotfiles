@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Sublime Text
+#
+# This runs setup for Sublime Text
+
+sublime2_dir=~/Library/Application\ Support/Sublime\ Text\ 2/Packages
+
+if [ -d "$sublime2_dir" ]; then
+	. sublime2/setup
+fi
+
+sublime3_dir=~/Library/Application\ Support/Sublime\ Text\ 3/Packages
+
+if [ -d "$sublime3_dir" ]; then
+	. sublime3/setup
+fi
