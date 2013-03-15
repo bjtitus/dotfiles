@@ -1,9 +1,14 @@
 {
 	"installed_packages":
 	[
+		"AdvancedNewFile",
+		"CoffeeScript",
+		"DocBlockr",
 		"Git",
 		"Github Tools",
+		"Http Requester",
 		"Package Control",
+		"SideBarEnhancements",
 		"SublimeLinter",
 		"Theme - Soda"
 	],

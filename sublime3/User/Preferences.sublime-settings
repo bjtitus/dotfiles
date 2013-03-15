@@ -3,7 +3,6 @@
 	"font_size": 17.0,
 	"ignored_packages":
 	[
-		"Vintage"
 	],
 	"theme": "Soda Light.sublime-theme"
 }
