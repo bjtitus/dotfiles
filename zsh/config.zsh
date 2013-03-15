@@ -75,4 +75,4 @@ export EDITOR="$HOME/bin/mate -w"
 plugins=(git mygit history-substring-search github osx fasd zsh-syntax-highlighting)
 
 # Customize to your needs...
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/git/bin:$HOME/.rvm/bin:$HOME/bin:/Applications/Postgres.app/Contents/MacOS/bin
+#export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/git/bin:$HOME/bin:/Applications/Postgres.app/Contents/MacOS/bin
