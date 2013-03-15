@@ -3,7 +3,9 @@
 	[
 		"AdvancedNewFile",
 		"CoffeeScript",
+		"DashDoc",
 		"DocBlockr",
+		"Emmet",
 		"Git",
 		"Github Tools",
 		"Http Requester",
