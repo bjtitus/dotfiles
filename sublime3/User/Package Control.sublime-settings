@@ -1,14 +1,19 @@
 {
+	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
 		"AdvancedNewFile",
+		"AngularJS",
 		"CoffeeScript",
 		"DashDoc",
 		"DocBlockr",
 		"Emmet",
-		"Git",
+		"Gist",
 		"Github Tools",
+		"Handlebars",
 		"Http Requester",
+		"knockdown",
+		"LESS",
 		"Package Control",
 		"Sass",
 		"SideBarEnhancements",
