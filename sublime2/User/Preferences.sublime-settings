@@ -1,4 +1,8 @@
 {
 	"color_scheme": "Packages/Color Scheme - Default/Cobalt.tmTheme",
+	"ignored_packages":
+	[
+		"Vintage"
+	],
 	"theme": "Soda Light.sublime-theme"
 }

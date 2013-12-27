@@ -1,18 +1,34 @@
 {
+	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
 		"AdvancedNewFile",
+		"All Autocomplete",
 		"CoffeeScript",
+		"CSSLint",
 		"DashDoc",
 		"DocBlockr",
 		"Emmet",
 		"Git",
+		"GitGutter",
 		"Github Tools",
 		"Http Requester",
+		"JSHint",
+		"JSHint Inline",
+		"knockdown",
+		"LESS",
 		"Package Control",
+		"Prefixr",
+		"Pretty JSON",
+		"Rust",
+		"Sass",
+		"SCSS",
+		"Search in Project",
 		"SideBarEnhancements",
 		"SublimeLinter",
-		"Theme - Soda"
+		"Theme - Cobalt2",
+		"Theme - Soda",
+		"Theme - Spacegray"
 	],
 	"repositories":
 	[

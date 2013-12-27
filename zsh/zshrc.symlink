@@ -35,4 +35,9 @@ fi
 
 export PATH=$PATH:$DOTS/bin # Add RVM to PATH for scripting
 
+if [[ -a "/usr/local/share/npm/bin" ]]
+then 
+	export PATH=$PATH:/usr/local/share/npm/bin
+fi
+
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
