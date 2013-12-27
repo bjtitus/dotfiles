@@ -1,9 +1,9 @@
 {
-	"color_scheme": "Packages/Color Scheme - Default/Cobalt.tmTheme",
-	"font_size": 18.0,
+	"color_scheme": "Packages/Theme - Cobalt2/cobalt2.tmTheme",
+	"font_size": 15.0,
 	"ignored_packages":
 	[
 	],
 	"open_files_in_new_window": true,
-	"theme": "Soda Light.sublime-theme"
+	"theme": "Spacegray.sublime-theme"
 }

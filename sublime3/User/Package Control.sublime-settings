@@ -3,22 +3,34 @@
 	"installed_packages":
 	[
 		"AdvancedNewFile",
+		"All Autocomplete",
 		"AngularJS",
 		"CoffeeScript",
+		"CSSLint",
 		"DashDoc",
 		"DocBlockr",
 		"Emmet",
 		"Gist",
+		"GitGutter",
 		"Github Tools",
 		"Handlebars",
 		"Http Requester",
+		"JSHint",
+		"JSHint Inline",
 		"knockdown",
 		"LESS",
 		"Package Control",
+		"Prefixr",
+		"Pretty JSON",
+		"Rust",
 		"Sass",
+		"SCSS",
+		"Search in Project",
 		"SideBarEnhancements",
 		"SublimeLinter",
-		"Theme - Soda"
+		"Theme - Cobalt2",
+		"Theme - Soda",
+		"Theme - Spacegray"
 	],
 	"repositories":
 	[
