@@ -1,0 +1,8 @@
+#!/bin/sh
+# Setup a machine for MailMate
+set -x
+
+echo "Installing MailMate"
+
+mv "$sublime_dir/Resources" "$sublime_dir/Resources.backup"
+ln -s "$ZSH/mailmate/Resources" "$sublime_dir"

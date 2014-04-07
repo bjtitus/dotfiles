@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# MailMate
+#
+# This runs setup for MailMate
+
+mailmate_dir=~/Library/Application\ Support/MailMate
+
+if [ -d "$mailmate_dir" ]; then
+	. mailmate/setup
+fi

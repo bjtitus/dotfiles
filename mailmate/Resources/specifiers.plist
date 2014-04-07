@@ -1,0 +1,445 @@
+/*
+Read the first few entries below to learn the format.
+
+Current limitation: One can only specify subranges of the original strings.
+
+WARNING: Be very careful with changing anything below. Internally, MailMate uses and thus depends on numerous specifiers.
+*/
+
+{
+	shorthands =
+	{
+		"#recipient" = {
+			specifiers = ( "to.split", "cc.split", "bcc.split" );
+		};
+		"#any-address" = {
+			specifiers = ( "to.split", "cc.split", "bcc.split", "from" );
+		};
+		"#common" = {
+			specifiers = ( "#any-address", "#unquoted", "subject" );
+		};
+		"#mailer" = {
+			specifiers = ( "x-mailer", "user-agent", "x-newsreader" );
+		};
+		// "#spam-info" = {
+		// 	specifiers = ( "x-spam-status", "x-spam-score" );
+		// };
+		"#original-to" = {
+			// Relevant headers: http://www.ii.com/internet/robots/procmail/qs/#virtualDomain
+			//  If the list here is extended then also extend the 'address' parser further below
+			//  February 19, 2011: Removed 'delivered-to' since it works badly for some people where delivery is via qmail.
+			//   It was probably also wrong to use it although I'm not sure that is true for all message delivery programs
+			//   Ideally, the following should probably be easily changed/enabled/disabled by the user.
+			//   Relevant problematic message: <8E7DDB80-FB53-43FA-A061-76CDBAE89D48@vertdeco.fr>
+			specifiers = ( "x-original-to", "x-delivered-to" );
+		};
+	};
+
+	parsers =
+	{
+			// Note the non-ASCII colon (\uFF1A - a full width colon) which is used by some Chinese messages.
+//			((?:\s*(?i:\p{Alpha}{2,3}(?:\[\d+\])?)[:：])+)?  # Prefix including things like "Re: Re[5]:".
+			// specifierRegex = '(?x)
+			// 	^\s*                          # Whitespace
+			// 	-->
+			// 	((?:\s*(?i:(?:\p{Alpha}{2,3}|\p{Alpha}{2}\[\d+\]))[:：])+)?  # Prefix including things like "Re: Re[5]:".
+			// 	\s*                           # Whitespace
+			// 	(?:\[([^\[\]]+)\])?           # Subject blob, e.g., "[TxMt]"
+			// 	\s*                           # Whitespace
+			// 	((?:\s*(?i:(?:\p{Alpha}{2,3}|\p{Alpha}{2}\[\d+\]))[:：])+)?  # Prefix including things like "Re: Re[5]:".
+			// 	\s*                           # Whitespace
+			// 	(.*)$                         # Subject body
+			// 	';
+
+		subject = {
+			header = "subject";
+			// Note the non-ASCII colon (\uFF1A - a full width colon) which is used by some Chinese messages.
+			specifierRegex = '(?x)
+				^\s*                          # Whitespace
+				((?:\s*\p{Alpha}{2,3}(?:\[\d+\])?[:：])+)?  # Prefix including things like "Re: Re[5]:".
+				\s*                           # Whitespace
+				(?:\[([^\[\]]+)\])?           # Subject blob, e.g., "[TxMt]"
+				\s*                           # Whitespace
+				((?:\s*\p{Alpha}{2,3}(?:\[\d+\])?[:：])+)?  # Prefix including things like "Re: Re[5]:".
+				\s*                           # Whitespace
+				(.*)$                         # Subject body
+				';
+			specifierCaptures = {
+				1 = { specifier = "prefix"; };
+				2 = { specifier = "blob"; };
+				3 = { specifier = "prefix"; };
+				// 4 = { specifier = "blob"; };
+				4 = { specifier = "body"; type="noTabs"; parsers = ( "words", "FogBugz" ); };
+			};
+		};
+		words = {
+			specifierRegex = '\b([[:alpha:]]+)\b';
+			specifierCaptures = {
+				1 = { specifier = "word"; };
+			};
+			// Useful for counting words, matching on word, matching on first/last word, etc.
+			//  e.g., subject.word = "MailMate"
+		};
+		addresses = {
+			// Message headers which can be split by this parser.
+			headers = ( "to", "cc", "bcc", "resent-to", "resent-cc", "resent-bcc", "reply-to", "#recipient", "#any-address" );
+			// A regular expression for splitting the header. It is repeated until end of string.
+			specifierRegex = '^[,\s]*((?:"(?:[^"\\]|\\.)*")?[^,]*[^,\s])\s*(,|$)';
+			// The 'alwaysImplicit' makes this parser default, i.e., whenever you refer to the header
+			// 'cc' then you are really referring to 'cc.split'. When the 'alwaysImplicit' flag is used
+			// then only 1 capture makes sense, but it can be repeated.
+			// The 'parsers' keyword specifies sub-parsers which can be used to further split up the
+			// the string.
+			specifierCaptures = {
+				1 = { specifier = "split"; parsers = ( "address" ); alwaysImplicit = :true; };
+			};
+		};
+		identifier = {
+			headers = ( "list-id" );
+			specifierRegex = '(?x)
+				^\s*(?:
+				|"((?:[^"\\]|\\.)*)"\s*<\s*([^>\s]*)\s*> # "Description" <identifier>
+				|([^<>]*[^<>\s])\s*<\s*([^>\s]*)\s*>     # Description <identifier>
+				|<\s*([^>\s]*)\s*>                       # <identifier>
+				|\s*([^>\s]*)\s*                         # identifier - not RFC2919, but seen on, e.g., the IMAP protocol mailing list
+				)\s*$';
+
+			specifierCaptures = {
+				1 = { specifier = "description"; type="quotedString"; };
+				2 = { specifier = "identifier"; parsers = ( "domainlevels"); canBeImplicit = :true;};
+				3 = { specifier = "description"; };
+				4 = { specifier = "identifier"; parsers = ( "domainlevels"); canBeImplicit = :true;};
+				5 = { specifier = "identifier"; parsers = ( "domainlevels"); canBeImplicit = :true;};
+				6 = { specifier = "identifier"; parsers = ( "domainlevels"); canBeImplicit = :true;};
+			};
+		};
+		address = {
+			// Note that both 'headers' and 'header' are supported as keywords (most often only 1 is specified)
+			headers = ( "from", "resent-from", "x-original-to", "delivered-to", "x-delivered-to", "#original-to", "envelope-to", "x-envelope-to" );
+			// A regular expression capturing the name and the address part
+			// Due to the many styles used for this header (standard and non-standard),
+			// the regex is quite complicated.
+			specifierRegex = '(?x)
+				^\s*(
+				 \"\s*\"\s*<(.*@.*)>             # "" <email>
+				|\"\x27?(.+?)\x27?\"\s*<(.*@.*)>(?:\s*\(.*\)\s*)? # "Name" <email> (Comment)
+				|\x27(.+?)\x27\s*<(.*@.*)>(?:\s*\(.*\)\s*)?       # Name <email> (Comment)
+				|(\S.*\S|\S)\s*<([^<]*@[^>]*)>(?:\s*\(.*\)\s*)?   # Name <email> (Comment)
+				|<\s*<(\S.*@[^>]*\S)>\s*>        # <<email>>
+				|<(\S.*@.*\S)>                   # <email>
+				|(\S.*@.*\S)\s*[(](\S.*\S|\S)\s*<(?:\k<11>)>[)] # email (Name <email>)
+				|(\S.*@.*\S)\s*[(](.*)[)]        # email (Name)
+				|(\S.*\S)                        # email
+				)\s*$';
+
+			specifierCaptures = {
+				2 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				3 = { specifier = "name"; type="quotedString"; parsers = ( "name" ); };
+				4 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				5 = { specifier = "name"; type="quotedString"; parsers = ( "name" ); };
+				6 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				7 = { specifier = "name"; parsers = ( "name" ); };
+				8 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				9 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				10 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+			 	11= { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				12 = { specifier = "name"; parsers = ( "name" ); };
+			 	13= { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+				14 = { specifier = "name"; parsers = ( "name" ); };
+				15 = { specifier = "address"; type = "address"; parsers = ( "domain" ); canBeImplicit = :true;  };
+			};
+			/* Alternative idea:
+			Captures is an array which is auto-enumerated 1-n, unless indices are explicitly specified, e.g.,
+			specifierCaptures = (
+				{ indices = (1,3); specifier = "name"; };
+				{ indices = (2); specifier = "address"; type = "address"; parsers = ( "domain" );
+				);
+			It should then probably be either none or all that are explicitly specified. Or maybe just auto-enumerate
+			with the first unused index.
+			*/
+		};
+		name = {
+			specifierRegex = '^(.*),\s*(.*)|(?:(.*) )?([^ ]*)$';
+			specifierCaptures = {
+				1 = { specifier = "last"; }; // Before comma
+				2 = { specifier = "first"; }; // After comma
+				3 = { specifier = "first"; }; // All but the last word
+				4 = { specifier = "last"; }; // Last word
+			};
+		};
+		domain = {
+			specifierRegex = '^(.*)@(.*)|(.*)$';
+			specifierCaptures = {
+				1 = { specifier = "user"; };
+				2 = { specifier = "domain"; parsers = ( "domainlevels");  canBeImplicit = :true; };
+				3 = { specifier = "user"; }; // The entire string if no occurences of @
+			};
+		};
+		domainlevels = {
+			variables = {
+				// Note: An atom should actually also allow surrounding CFWS...
+				atom = "[a-z0-9!#$%&'*+-/=?^_`{|}~]+"; // RFC2822  FIXME: Why is it without the '
+			};
+			specifierRegexFormatString = '(?x)
+				^(?i:
+				 (?:(${atom}).*\.(${atom})\.(${atom})\.(${atom}))
+				|(?:((${atom}))\.(${atom})\.(${atom}))
+				|(?:((${atom}))\.(${atom}))
+				)$';
+			specifierCaptures = {
+				1 = { specifier = "final-level"; };
+				2 = { specifier = "third-level"; };
+				3 = { specifier = "second-level"; };
+				4 = { specifier = "top-level"; };
+				5 = { specifier = "final-level"; };
+				6 = { specifier = "third-level"; };
+				7 = { specifier = "second-level"; };
+				8 = { specifier = "top-level"; };
+				9 = { specifier = "final-level"; };
+				10 = { specifier = "second-level"; };
+				11 = { specifier = "top-level"; };
+			};
+		};
+		content-type = {
+			header = "content-type";
+			stripComments = :true; // Not implemented
+			specifierRegex = '^(?:([^/]+)/([^;\s]+))\s*(;.*)?';
+			specifierCaptures = {
+				1 = { specifier = "type"; };
+				2 = { specifier = "subtype"; };
+				3 = { specifier = "parameter"; parsers = ( "parameters" ); canBeImplicit = :true; };
+			};
+		};
+		content-disposition = {
+			header = "content-disposition";
+			specifierRegex = '^([^;]+)\s*(;.*)?';
+			specifierCaptures = {
+				1 = { specifier = "type"; };
+				2 = { specifier = "parameter"; parsers = ( "parameters" ); canBeImplicit = :true; };
+			};
+		};
+		parameters = {
+			specifierRegex = '^(?:;\s*([^;]+))';
+			specifierCaptures = {
+				1 = { specifier = "split"; parsers = ( "parameter" ); alwaysImplicit = :true; };
+			};
+		};
+		// Reference: http://tools.ietf.org/html/rfc2045#appendix-A (not)
+		// Note that we do not use the correct character-sets (yet).
+		parameter = {
+			specifierRegex = '(?x)
+				^(?i:                                    # Case insensitive matching on all of the attribute names
+				 (?:charset\s*=\s* (?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)"))) # Note the parsing of quoted strings with quoted characters
+				|(?:boundary\s*=\s*(?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:format\s*=\s*  (?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:delsp\s*=\s*   (?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:name\s*=\s*    (?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:filename\s*=\s*(?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:markup\s*=\s*(?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:protocol\s*=\s*(?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				|(?:micalg\s*=\s*(?:([^"\s]*)|(?:"((?:[^"\\]|\\.)*)")))
+				)\s*$';
+			specifierCaptures = {
+				1 = { specifier = "charset"; };
+				2 = { specifier = "charset"; };
+				3 = { specifier = "boundary"; };
+				4 = { specifier = "boundary"; };
+				5 = { specifier = "format"; };
+				6 = { specifier = "format"; };
+				7 = { specifier = "delsp"; };
+				8 = { specifier = "delsp"; };
+				9 = { specifier = "name"; };
+				10 = { specifier = "name"; type="quotedString"; };
+				11 = { specifier = "filename"; };
+				12 = { specifier = "filename"; type="quotedString"; };
+				13 = { specifier = "markup"; };
+				14 = { specifier = "markup"; };
+				15 = { specifier = "protocol"; };
+				16 = { specifier = "protocol"; };
+				17 = { specifier = "micalg"; };
+				18 = { specifier = "micalg"; };
+				// FIXME: How can the above be done in a nicer fashion.
+				//  Half of them could be removed if stripping the "s could be done by specifying a flag.
+				//   And that would be sufficient since each parameter value should be able to have its own sub-parser
+			};
+		};
+		messageid = {
+			headers = ( "message-id", "content-id" );
+			specifierRegex = '^\s*<?([^>]+)>?\s*$';
+			specifierCaptures = {
+				1 = { specifier = "split"; parsers = ( "address" ); alwaysImplicit = :true; };
+			};
+		};
+		in-reply-to = {
+			headers = ( "in-reply-to", "references" );
+			specifierRegex = '\s*<(.*?)>';
+			specifierCaptures = {
+				1 = { specifier = "split"; parsers = ( "address" ); alwaysImplicit = :true; };
+			};
+		};
+		mailer = {
+			headers = ( "x-mailer", "user-agent", "x-newsreader", "#mailer" );
+			specifierRegex = '^\s*([^(\[\d/]*[[:alpha:]])\s*(?:[(\[/]?)\s*([\d.]*).*$'; // Should be much more elaborate to catch most/all mailers.
+			specifierCaptures = {
+				1 = { specifier = "name"; };
+				2 = { specifier = "version"; parsers = ( "version" ); };
+			};
+		};
+		version = {
+			specifierRegex = '^(\d+)\.(\d+)?.*$';
+			specifierCaptures = {
+				1 = { specifier = "major"; };
+				2 = { specifier = "minor"; };
+			};
+		};
+		flags = {
+			headers = ( "#flags" );
+			specifierRegex = '(\S+)';
+			specifierCaptures = {
+				1 = { specifier = "flag"; /*alwaysImplicit = :true;*/ };
+			};
+		};
+		// This is essentially a hack introduced to easily sort on the flagged/seen value in the messages outline
+		// Refactor: What is really needed is to be able to sort on any value including a formatted string
+		flagged = {
+			headers = ( "#flags" );
+			specifierRegex = '(\\Flagged)|(\\Seen)\b';
+			specifierCaptures = {
+				1 = { specifier = "flagged"; };
+				2 = { specifier = "seen"; };
+			};
+		};
+		url = {
+			headers = ( "#source", "#old-source", "#relay", "#relayed" );
+			specifierRegex = '^([a-zA-Z-]*)://([^/]*)(?:/(.*))?|mailto:(.*)$';
+			specifierCaptures = {
+				1 = { specifier = "protocol"; };
+				2 = { specifier = "server"; parsers = ( "server" ); };
+				3 = { specifier = "path"; parsers = ( "noinbox" ); };
+				4 = { specifier = "mailto"; };
+			};
+		};
+		server = {
+			specifierRegex = '^(.*)@(.*)|(.*)$';
+			specifierCaptures = {
+				1 = { specifier = "user"; };
+				2 = { specifier = "domain"; parsers = ( "domainlevels" ); };
+				3 = { specifier = "domain"; parsers = ( "domainlevels" ); };
+			};
+		};
+		noinbox = {
+			// Strip INBOX if it is a prefix
+			specifierRegex = '^(?:INBOX/)?(.*)$';
+			specifierCaptures = {
+				1 = { specifier = "noinbox"; };
+			};
+		};
+		received = { // http://cr.yp.to/immhf/envelope.html#received
+			headers = ( "received" ); // For IP when needed: (?:[^\d.]((\d{1,3}\.){3}\d{1,3})[^\d.])
+			specifierRegex = '^(.*)(?:for <(.*)>).*$';
+			specifierCaptures = {
+				1 = { specifier = "notsure"; };
+				2 = { specifier = "for"; type = "address"; parsers = ( "domain"); canBeImplicit = :true; };
+			};
+		};
+		greylist = { // X-Greylist: delayed 5846 seconds by postgrey-1.27 at server.co; Sat, 24 Jan 2009 01:34:42 CET
+			headers = ( "x-greylist" );
+			specifierRegex = 'delayed (\d*) seconds';
+			specifierCaptures = {
+				1 = { specifier = "seconds"; };
+			};
+		};
+		date = {
+			headers = ( "#date", "#date-received", "#date-sent", "#date-last-viewed", "#send-later-date" );
+			specifierRegex = '(((((\d{4})-\d\d)-\d\d) \d\d):\d\d:\d\d\s?(.\d\d\d\d)?)'; // 1969-12-31 23:59:59 +0100
+			specifierCaptures = {
+				1 = { specifier = "formatted"; type = "formattedDate"; };
+				2 = { specifier = "hour"; };
+				3 = { specifier = "day"; };
+				4 = { specifier = "month"; };
+				5 = { specifier = "year"; };
+				6 = { specifier = "zone"; };
+			};
+		};
+		// Special case for converting a date to a relative day like '2 months ago'
+		relativeDate = {
+			headers = ( "#date", "#date-received", "#date-last-viewed", "#send-later-date" );
+			specifierRegex = '(.*)';
+			specifierCaptures = {
+				1 = { specifier = "relative"; type = "relativeDate"; };
+			};
+		};
+		size = {
+			headers = ( "#size" );
+			specifierRegex = '(.*)';
+			specifierCaptures = {
+				1 = { specifier = "formatted"; type = "formattedSize"; };
+			};
+		};
+		list-post = {
+			header = "list-post";
+			specifierRegex ='(?x)
+				^\s*
+				(?:(NO)                     # Special value indicating one cannot post to this list
+				  |\<(?:(?:mailto\:([^>]*)) # mailto link -- the typical use of this header
+				         |([^>]*))\>        # Anything else (probably a URL)
+				)
+				(?:\s*\(([^)]*)\))?         # Optional comment in parenthesis
+				\s*$
+				';
+			specifierCaptures = {
+				1 = { specifier = "no"; };
+				2 = { specifier = "mailto"; };
+				3 = { specifier = "url"; };
+				4 = { specifier = "comment"; };
+			};
+		};
+		x-spam-status = {
+			header = "x-spam-status";
+			specifierRegex = '^(Yes|No)(?:, (?:score|hits)=([-0-9.]+)(?:.* required=([-0-9.]+))?(?:.* tests=\[([-0-9.A-Z_=, ]*)\])?)?.*$'; // No, score=1.6 required=5.0
+			specifierCaptures = {
+				1 = { specifier = "true"; };
+				2 = { specifier = "score"; };
+				3 = { specifier = "required"; };
+				4 = { specifier = "tests"; parsers = ( "tests" ); };
+			};
+		};
+		tests = {
+			specifierRegex = '(?:\s|,)*([A-Z0-9_]+)(=[-0-9.]+)?';
+			specifierCaptures = {
+				1 = { specifier = "test"; };
+				2 = { specifier = "score"; };
+			};
+		};
+		x-spam-score = {
+			header = "x-spam-score";
+			specifierRegex = '^([-0-9.]+)\s*(?:\((\**)\))?\s*(.*)$';
+			specifierCaptures = {
+				1 = { specifier = "score"; };
+				2 = { specifier = "stars"; };
+				3 = { specifier = "tests"; parsers = ( "tests" ); };
+			};
+		};
+		x-priority = {
+			header = "x-priority";
+			specifierRegex = '^([1-5]).*$';
+			specifierCaptures = {
+				1 = { specifier = "value"; };
+			};
+		};
+		tokens = {
+			headers = ( "#any-header" ); // Dummy name to be used to get this field parser
+			specifierRegex = '\s*\S+'; // Simple space-separated segments
+			specifierCaptures = {
+				1 = { specifier = "split"; };
+			};
+		};
+		FogBugz = {
+    	specifierRegex = 'FogBugz\s\(Case (\d+)\)\s([a-zA-Z0-9\s]+)-\s.+';
+    	specifierCaptures = {
+        1 = { specifier = "fogbugz-case"; };
+        2 = { specifier = "fogbugz-project"; };
+      };
+    };
+	};
+}
