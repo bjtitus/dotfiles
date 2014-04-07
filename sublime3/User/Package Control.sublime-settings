@@ -3,6 +3,7 @@
 	"installed_packages":
 	[
 		"AdvancedNewFile",
+		"Alignment",
 		"All Autocomplete",
 		"AngularJS",
 		"CoffeeScript",
@@ -11,12 +12,12 @@
 		"DocBlockr",
 		"Emmet",
 		"Gist",
+		"Git",
 		"GitGutter",
 		"Github Tools",
 		"Handlebars",
 		"Http Requester",
-		"JSHint",
-		"JSHint Inline",
+		"JSHint Gutter",
 		"knockdown",
 		"LESS",
 		"Package Control",
