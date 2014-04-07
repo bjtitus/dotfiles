@@ -4,5 +4,11 @@ set -x
 
 echo "Installing MailMate"
 
-mv "$sublime_dir/Resources" "$sublime_dir/Resources.backup"
-ln -s "$ZSH/mailmate/Resources" "$sublime_dir"
+DOTFILES_ROOT="`pwd`"
+
+mailmate_dir=~/Library/Application\ Support/MailMate
+
+if [ -d "$mailmate_dir/Resources" ]; then
+	mv "$mailmate_dir/Resources" "$mailmate_dir/Resources.backup"
+fi
+ln -s "$DOTFILES_ROOT/mailmate/Resources" "$mailmate_dir"
