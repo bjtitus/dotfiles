@@ -66,8 +66,9 @@ export ZSH_THEME="agnoster"
 # export DISABLE_AUTO_TITLE="true"
 
 export PYTHONPATH=/usr/local/lib/python2.7/site-packages/
+export GOPATH="$HOME/go"
 
-export CC=/usr/bin/gcc-4.2
+# export CC=/usr/bin/gcc-4.2
 export EDITOR="$HOME/bin/mate -w"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
