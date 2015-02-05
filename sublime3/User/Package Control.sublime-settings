@@ -1,40 +1,11 @@
 {
-	"auto_upgrade_last_run": null,
+	"in_process_packages":
+	[
+	],
 	"installed_packages":
 	[
-		"AdvancedNewFile",
-		"Alignment",
-		"All Autocomplete",
-		"AngularJS",
-		"CoffeeScript",
-		"CSSLint",
-		"DashDoc",
-		"DocBlockr",
-		"Emmet",
-		"Gist",
-		"Git",
-		"GitGutter",
-		"Github Tools",
-		"Handlebars",
-		"Http Requester",
-		"JSHint Gutter",
-		"knockdown",
-		"LESS",
 		"Package Control",
-		"Prefixr",
-		"Pretty JSON",
-		"Rust",
-		"Sass",
-		"SCSS",
-		"Search in Project",
-		"SideBarEnhancements",
-		"SublimeLinter",
-		"Theme - Cobalt2",
-		"Theme - Soda",
-		"Theme - Spacegray"
-	],
-	"repositories":
-	[
-		"https://sublime.wbond.net/testing/packages.json"
+		"Theme - Spacegray",
+		"Vintageous"
 	]
 }
